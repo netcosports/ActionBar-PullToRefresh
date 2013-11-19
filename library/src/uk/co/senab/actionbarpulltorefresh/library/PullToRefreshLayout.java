@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.HeaderViewListener;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.ViewDelegate;
+import uk.co.senab.actionbarpulltorefresh.library.widget.PullToRefreshProgressBar;
 
 /**
  * The main component of the library. You wrap the views you wish to be 'pullable' within this layout.
@@ -46,6 +48,8 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private PullToRefreshAttacher mPullToRefreshAttacher;
 
+    private final PullToRefreshProgressBar mProgressBar;
+
     public PullToRefreshLayout(Context context) {
         this(context, null);
     }
@@ -56,6 +60,20 @@ public class PullToRefreshLayout extends FrameLayout {
 
     public PullToRefreshLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        // TODO: Add Progress Bar
+
+        mProgressBar = new PullToRefreshProgressBar(context);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        addView(mProgressBar, lp);
+
+        if (mProgressBar != null) {
+            setChildrenDrawingOrderEnabled(true);
+        }
+
+        mProgressBar.setProgress(5000);
+
     }
 
     /**
@@ -76,6 +94,15 @@ public class PullToRefreshLayout extends FrameLayout {
     public final boolean isRefreshing() {
         ensureAttacher();
         return mPullToRefreshAttacher.isRefreshing();
+    }
+
+    @Override
+    protected int getChildDrawingOrder(final int childCount, final int i) {
+        if (mProgressBar != null && childCount > 1) {
+            return (i < childCount - 1) ? i + 1 : 0;
+        } else {
+            return super.getChildDrawingOrder(childCount, i);
+        }
     }
 
     /**
