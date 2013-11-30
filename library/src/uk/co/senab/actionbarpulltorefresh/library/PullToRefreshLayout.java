@@ -65,15 +65,10 @@ public class PullToRefreshLayout extends FrameLayout {
 
         mProgressBar = new PullToRefreshProgressBar(context);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+        lp.gravity = Gravity.CENTER;
         addView(mProgressBar, lp);
 
-        if (mProgressBar != null) {
-            setChildrenDrawingOrderEnabled(true);
-        }
-
         mProgressBar.setProgress(5000);
-
     }
 
     /**
@@ -94,15 +89,6 @@ public class PullToRefreshLayout extends FrameLayout {
     public final boolean isRefreshing() {
         ensureAttacher();
         return mPullToRefreshAttacher.isRefreshing();
-    }
-
-    @Override
-    protected int getChildDrawingOrder(final int childCount, final int i) {
-        if (mProgressBar != null && childCount > 1) {
-            return (i < childCount - 1) ? i + 1 : 0;
-        } else {
-            return super.getChildDrawingOrder(childCount, i);
-        }
     }
 
     /**
@@ -154,6 +140,12 @@ public class PullToRefreshLayout extends FrameLayout {
             return mPullToRefreshAttacher.onInterceptTouchEvent(event);
         }
         return false;
+    }
+
+    @Override
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
+        bringChildToFront(mProgressBar);
     }
 
     @Override
