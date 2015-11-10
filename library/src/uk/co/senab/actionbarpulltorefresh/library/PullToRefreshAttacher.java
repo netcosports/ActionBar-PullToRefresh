@@ -591,29 +591,31 @@ public class PullToRefreshAttacher {
 
     protected void addHeaderViewToActivity(View headerViewLayout, Activity activity) {
         // Get the Display Rect of the Decor View
-        final View decorView = activity.getWindow().getDecorView();
-        final Rect visibleRect = new Rect();
-        decorView.getWindowVisibleDisplayFrame(visibleRect);
+        if(activity != null) {
+            final View decorView = activity.getWindow().getDecorView();
+            final Rect visibleRect = new Rect();
+            decorView.getWindowVisibleDisplayFrame(visibleRect);
 
-        // Honour the requested layout params
-        int width = WindowManager.LayoutParams.MATCH_PARENT;
-        int height = WindowManager.LayoutParams.WRAP_CONTENT;
-        ViewGroup.LayoutParams requestedLp = headerViewLayout.getLayoutParams();
-        if (requestedLp != null) {
-            width = requestedLp.width;
-            height = requestedLp.height;
+            // Honour the requested layout params
+            int width = WindowManager.LayoutParams.MATCH_PARENT;
+            int height = WindowManager.LayoutParams.WRAP_CONTENT;
+            ViewGroup.LayoutParams requestedLp = headerViewLayout.getLayoutParams();
+            if (requestedLp != null) {
+                width = requestedLp.width;
+                height = requestedLp.height;
+            }
+
+            // Create LayoutParams for adding the View as a panel
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(width, height,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    PixelFormat.TRANSLUCENT);
+            params.x = 0;
+            params.y = visibleRect.top;
+            params.gravity = Gravity.TOP;
+
+            activity.getWindowManager().addView(headerViewLayout, params);
         }
-
-        // Create LayoutParams for adding the View as a panel
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(width, height,
-                WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
-        params.x = 0;
-        params.y = visibleRect.top;
-        params.gravity = Gravity.TOP;
-
-        activity.getWindowManager().addView(headerViewLayout, params);
     }
 
     protected void removeHeaderViewFromActivity(View headerViewLayout, Activity activity) {
